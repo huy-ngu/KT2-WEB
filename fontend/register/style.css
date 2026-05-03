@@ -1,0 +1,33 @@
+﻿body {
+  font-family: Arial, sans-serif;
+  max-width: 360px;
+  margin: 40px auto;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+input,
+button {
+  padding: 8px;
+  font-size: 14px;
+}
+
+.switch-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: #0b57d0;
+  text-decoration: none;
+}
+
+.switch-link:hover {
+  text-decoration: underline;
+}
+
+#message {
+  margin-top: 10px;
+  font-size: 14px;
+}

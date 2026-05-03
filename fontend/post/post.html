@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <h2>Danh sách Post</h2>
+
+  <div class="toolbar">
+    <input type="text" id="searchInput" placeholder="Tìm kiếm..." />
+  </div>
+
+  <table id="postTable">
+    <thead id="tableHead"></thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <div class="pagination">
+    <button id="prevBtn" type="button">Prev</button>
+    <span id="pageInfo"></span>
+    <button id="nextBtn" type="button">Next</button>
+  </div>
+
+  <p id="message"></p>
+
+  <script src="./script.js"></script>
+</body>
+</html>
