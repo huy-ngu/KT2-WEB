@@ -5,13 +5,12 @@
 }
 
 .toolbar {
-  margin-bottom: 10px;
   display: flex;
   gap: 8px;
+  margin-bottom: 10px;
 }
 
 input,
-textarea,
 button {
   padding: 6px 8px;
   font-size: 14px;
@@ -29,6 +28,15 @@ td {
   text-align: left;
 }
 
+.delete-btn {
+  color: #b00020;
+}
+
+.delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .pagination {
   display: flex;
   gap: 8px;
@@ -39,36 +47,4 @@ td {
 #message {
   margin-top: 10px;
   color: #c00;
-}
-
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal.hidden {
-  display: none;
-}
-
-.modal-content {
-  width: 100%;
-  max-width: 420px;
-  background: #fff;
-  padding: 16px;
-  border-radius: 4px;
-}
-
-#createPostForm {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 8px;
 }

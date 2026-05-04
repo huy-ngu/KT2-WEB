@@ -1,11 +1,39 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <h1>User</h1>
-  </body>
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <h2>Danh sách User</h2>
+
+  <div class="toolbar">
+    <input type="text" id="searchInput" placeholder="Tìm kiếm username..." />
+    <button type="button" id="searchBtn">Tìm</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Role</th>
+        <th>Thao tác</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <div class="pagination">
+    <button id="prevBtn" type="button">Prev</button>
+    <span id="pageInfo">0 / 0</span>
+    <button id="nextBtn" type="button">Next</button>
+  </div>
+
+  <p id="message"></p>
+
+  <script src="./script.js"></script>
+</body>
 </html>

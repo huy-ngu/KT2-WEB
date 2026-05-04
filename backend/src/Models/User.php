@@ -59,6 +59,69 @@ class User
         ]);
     }
 
+    public function findWithFilters(string $search = '', int $page = 1, int $limit = 10): array
+    {
+        $offset = ($page - 1) * $limit;
+        $query = "SELECT id, username, role FROM " . $this->table;
+
+        if ($search !== '') {
+            $query .= " WHERE username LIKE :search OR role LIKE :search";
+        }
+
+        $query .= " ORDER BY id DESC LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->db->prepare($query);
+
+        if ($search !== '') {
+            $stmt->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+        }
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+
+        return $rows ?: [];
+    }
+
+    public function countWithFilters(string $search = ''): int
+    {
+        $query = "SELECT COUNT(*) as total FROM " . $this->table;
+
+        if ($search !== '') {
+            $query .= " WHERE username LIKE :search OR role LIKE :search";
+        }
+
+        $stmt = $this->db->prepare($query);
+
+        if ($search !== '') {
+            $stmt->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+        }
+
+        $stmt->execute();
+        $result = $stmt->fetch();
+
+        return (int)($result['total'] ?? 0);
+    }
+
+    public function findById(int $id): ?array
+    {
+        $query = "SELECT id, username, role FROM " . $this->table . " WHERE id = :id LIMIT 1";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
+    public function delete(int $id): bool
+    {
+        $query = "DELETE FROM " . $this->table . " WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        return $stmt->execute([':id' => $id]);
+    }
+
     /**
      * Helper: Chuyển đổi mảng từ DB thành đối tượng Model
      */

@@ -10,7 +10,9 @@ use App\Router\Router;
 use App\Config\Database;
 use App\Controllers\AuthController;
 use App\Middleware\AuthMiddleware;
+use App\Middleware\AdminMiddleware;
 use App\Controllers\PostController;
+use App\Controllers\UserController;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
@@ -68,6 +70,10 @@ $router->get('/posts/{id}', [PostController::class, 'show']);
 $router->post('/posts', [PostController::class, 'store'], [AuthMiddleware::class]);
 $router->put('/posts/{id}', [PostController::class, 'update'], [AuthMiddleware::class]);
 $router->delete('/posts/{id}', [PostController::class, 'destroy'], [AuthMiddleware::class]);
+
+// user (admin only)
+$router->get('/users', [UserController::class, 'index'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->delete('/users/{id}', [UserController::class, 'destroy'], [AuthMiddleware::class, AdminMiddleware::class]);
 
 
 // 1. Khởi tạo đối tượng Request (nó tự động lấy body, query, headers)

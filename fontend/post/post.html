@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -11,6 +11,7 @@
 
   <div class="toolbar">
     <input type="text" id="searchInput" placeholder="Tìm kiếm..." />
+    <button id="openCreateModalBtn" type="button">Thêm post</button>
   </div>
 
   <table id="postTable">
@@ -25,6 +26,20 @@
   </div>
 
   <p id="message"></p>
+
+  <div id="createPostModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Thêm post mới</h3>
+      <form id="createPostForm">
+        <input type="text" id="createTitle" placeholder="Title" required />
+        <textarea id="createContent" placeholder="Content" rows="4" required></textarea>
+        <div class="modal-actions">
+          <button type="submit">Lưu</button>
+          <button type="button" id="closeCreateModalBtn">Đóng</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script src="./script.js"></script>
 </body>
