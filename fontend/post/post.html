@@ -41,6 +41,20 @@
     </div>
   </div>
 
+  <div id="updatePostModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Cập nhật post</h3>
+      <form id="updatePostForm">
+        <input type="text" id="updateTitle" placeholder="Title" required />
+        <textarea id="updateContent" placeholder="Content" rows="4" required></textarea>
+        <div class="modal-actions">
+          <button type="submit">Cập nhật</button>
+          <button type="button" id="closeUpdateModalBtn">Đóng</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="./script.js"></script>
 </body>
 </html>

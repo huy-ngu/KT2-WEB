@@ -32,7 +32,7 @@ document
     const messageEl = document.getElementById("message");
 
     try {
-      const baseUrl = await loadBaseUrl();
+      const baseUrl = "http://localhost:8000";
       const res = await fetch(`${baseUrl}/register`, {
         method: "POST",
         headers: {

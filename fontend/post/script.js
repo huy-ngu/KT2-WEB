@@ -14,11 +14,38 @@ const createPostModal = document.getElementById("createPostModal");
 const createPostForm = document.getElementById("createPostForm");
 const createTitleInput = document.getElementById("createTitle");
 const createContentInput = document.getElementById("createContent");
+const updatePostModal = document.getElementById("updatePostModal");
+const updatePostForm = document.getElementById("updatePostForm");
+const closeUpdateModalBtn = document.getElementById("closeUpdateModalBtn");
+const updateTitleInput = document.getElementById("updateTitle");
+const updateContentInput = document.getElementById("updateContent");
 
 let posts = [];
 let currentPage = 1;
 let totalPages = 1;
 let currentUserId = null;
+let tableColumns = [];
+let editingPostId = null;
+
+function normalizePostResponse(raw) {
+  if (Array.isArray(raw)) {
+    return { rows: raw, pagination: {} };
+  }
+
+  if (Array.isArray(raw?.data)) {
+    return { rows: raw.data, pagination: raw.pagination ?? {} };
+  }
+
+  if (Array.isArray(raw?.data?.data)) {
+    return { rows: raw.data.data, pagination: raw.data.pagination ?? {} };
+  }
+
+  if (Array.isArray(raw?.posts)) {
+    return { rows: raw.posts, pagination: raw.pagination ?? {} };
+  }
+
+  return { rows: [], pagination: raw?.pagination ?? {} };
+}
 
 function decodeJwtPayload(token) {
   const parts = token.split(".");
@@ -47,19 +74,35 @@ function formatDate(value) {
   return d.toLocaleString("vi-VN");
 }
 
+function collectColumns(rows) {
+  const colSet = new Set();
+  rows.forEach((row) => {
+    Object.keys(row || {}).forEach((key) => colSet.add(key));
+  });
+  return Array.from(colSet);
+}
+
+function formatCellValue(key, value) {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "object") return escapeHtml(JSON.stringify(value));
+  if (
+    /(^|_)(created|updated)_at$/i.test(key) ||
+    /^(createdAt|updatedAt)$/i.test(key)
+  ) {
+    return escapeHtml(formatDate(value));
+  }
+  return escapeHtml(value);
+}
+
 function renderTable() {
-  tableHead.innerHTML = `
-    <tr>
-      <th>Title</th>
-      <th>Content</th>
-      <th>Ngày tạo</th>
-      <th>Ngày sửa</th>
-      <th>Thao tác</th>
-    </tr>
-  `;
+  const headHtml = tableColumns
+    .map((col) => `<th>${escapeHtml(col)}</th>`)
+    .join("");
+  tableHead.innerHTML = `<tr>${headHtml}<th>Thao tác</th></tr>`;
 
   if (!posts.length) {
-    tableBody.innerHTML = "";
+    const colspan = Math.max(1, tableColumns.length + 1);
+    tableBody.innerHTML = `<tr><td colspan="${colspan}">Không có dữ liệu</td></tr>`;
     pageInfo.textContent = `${currentPage} / ${totalPages}`;
     prevBtn.disabled = true;
     nextBtn.disabled = true;
@@ -68,22 +111,16 @@ function renderTable() {
 
   tableBody.innerHTML = posts
     .map((item) => {
-      const createdValue = item.created_at ?? item.createdAt;
-      const updatedValue = item.updated_at ?? item.updatedAt;
-      const isOwner = Number(item.user_id) === Number(currentUserId);
-      const actionHtml = isOwner
-        ? `
-          <button type="button" class="edit-btn" data-id="${item.id}">Sửa</button>
-          <button type="button" class="delete-btn" data-id="${item.id}">Xóa</button>
-        `
-        : "";
+      const itemUserId = Number(item.user_id ?? item.userId ?? 0);
+      const isOwner = itemUserId === Number(currentUserId);
+      const actionHtml = `
+        <button type="button" class="edit-btn" data-id="${item.id}" ${isOwner ? "" : "disabled"}>Sửa</button>
+        <button type="button" class="delete-btn" data-id="${item.id}" ${isOwner ? "" : "disabled"}>Xóa</button>
+      `;
 
       return `
         <tr>
-          <td>${escapeHtml(item.title)}</td>
-          <td>${escapeHtml(item.content)}</td>
-          <td>${formatDate(createdValue)}</td>
-          <td>${formatDate(updatedValue)}</td>
+          ${tableColumns.map((col) => `<td>${formatCellValue(col, item[col])}</td>`).join("")}
           <td>${actionHtml}</td>
         </tr>
       `;
@@ -107,6 +144,19 @@ function openCreateModal() {
 function closeCreateModal() {
   createPostModal.classList.add("hidden");
   createPostForm.reset();
+}
+
+function openUpdateModal(post) {
+  editingPostId = post.id;
+  updateTitleInput.value = post.title ?? "";
+  updateContentInput.value = post.content ?? "";
+  updatePostModal.classList.remove("hidden");
+}
+
+function closeUpdateModal() {
+  updatePostModal.classList.add("hidden");
+  updatePostForm.reset();
+  editingPostId = null;
 }
 
 async function loadPosts() {
@@ -139,9 +189,10 @@ async function loadPosts() {
       return;
     }
 
-    const payload = data?.data ?? {};
-    posts = Array.isArray(payload.data) ? payload.data : [];
-    const pagination = payload.pagination ?? {};
+    const normalized = normalizePostResponse(data);
+    posts = normalized.rows;
+    tableColumns = collectColumns(posts);
+    const pagination = normalized.pagination ?? {};
     currentPage = Number(pagination.current_page || currentPage || 1);
     totalPages = Math.max(1, Number(pagination.total_pages || 1));
     messageEl.textContent = "";
@@ -219,6 +270,12 @@ createPostModal.addEventListener("click", (e) => {
     closeCreateModal();
   }
 });
+closeUpdateModalBtn.addEventListener("click", closeUpdateModal);
+updatePostModal.addEventListener("click", (e) => {
+  if (e.target === updatePostModal) {
+    closeUpdateModal();
+  }
+});
 
 createPostForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -239,6 +296,29 @@ createPostForm.addEventListener("submit", async (e) => {
   }
 });
 
+updatePostForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  if (!editingPostId) {
+    return;
+  }
+
+  const title = updateTitleInput.value.trim();
+  const content = updateContentInput.value.trim();
+
+  if (!title || !content) {
+    return;
+  }
+
+  try {
+    await updatePost(editingPostId, title, content);
+    closeUpdateModal();
+    await loadPosts();
+  } catch (error) {
+    messageEl.textContent = error.message || "Cập nhật post thất bại.";
+  }
+});
+
 tableBody.addEventListener("click", async (e) => {
   const editBtn = e.target.closest(".edit-btn");
   const deleteBtn = e.target.closest(".delete-btn");
@@ -248,17 +328,8 @@ tableBody.addEventListener("click", async (e) => {
     const post = posts.find((item) => String(item.id) === String(postId));
     if (!post) return;
 
-    const newTitle = prompt("Nhập title mới:", post.title ?? "");
-    if (newTitle === null) return;
-    const newContent = prompt("Nhập content mới:", post.content ?? "");
-    if (newContent === null) return;
-
-    try {
-      await updatePost(postId, newTitle.trim(), newContent.trim());
-      await loadPosts();
-    } catch (error) {
-      messageEl.textContent = error.message || "Cập nhật post thất bại.";
-    }
+    openUpdateModal(post);
+    return;
   }
 
   if (deleteBtn) {
