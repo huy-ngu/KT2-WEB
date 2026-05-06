@@ -72,4 +72,14 @@ class AuthController
             return Response::error($e->getMessage(), $code);
         }
     }
+
+    /**
+     * API: POST /logout
+     */
+    public function logout(Request $request): Response
+    {
+        return Response::success([
+            "message" => "Đăng xuất thành công. Vui lòng xóa access token ở client."
+        ], 200);
+    }
 }

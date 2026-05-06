@@ -14,10 +14,10 @@ class UserService
         $this->userModel = $userModel;
     }
 
-    public function getFilteredUsers(string $search = '', int $page = 1, int $limit = 10): array
+    public function getFilteredUsers(string $search = '', string $role = '', int $page = 1, int $limit = 10): array
     {
-        $users = $this->userModel->findWithFilters($search, $page, $limit);
-        $totalRecords = $this->userModel->countWithFilters($search);
+        $users = $this->userModel->findWithFilters($search, $role, $page, $limit);
+        $totalRecords = $this->userModel->countWithFilters($search, $role);
         $totalPages = (int)ceil($totalRecords / $limit);
 
         return [

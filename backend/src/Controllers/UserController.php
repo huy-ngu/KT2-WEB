@@ -19,22 +19,25 @@ class UserController
         $this->userService = new UserService(new User($db->getConnection()));
     }
 
-    // GET /users?search=&page=&limit=
+    // GET /users?search=&role=&page=&limit=
     public function index(Request $request): Response
     {
         try {
             $search = trim((string)($request->query['search'] ?? ''));
+            $role = trim((string)($request->query['role'] ?? ''));
             $page = (int)($request->query['page'] ?? 1);
             $limit = (int)($request->query['limit'] ?? 10);
 
             $page = $page > 0 ? $page : 1;
             $limit = ($limit > 0 && $limit <= 100) ? $limit : 10;
 
-            $result = $this->userService->getFilteredUsers($search, $page, $limit);
+            $result = $this->userService->getFilteredUsers($search, $role, $page, $limit);
 
             return Response::success($result);
         } catch (Exception $e) {
-            return Response::error($e->getMessage(), $e->getCode() ?: 500);
+            $code = (int)$e->getCode();
+            $code = $code > 0 ? $code : 500;
+            return Response::error($e->getMessage(), $code);
         }
     }
 
@@ -45,7 +48,11 @@ class UserController
             $this->userService->deleteUser($id);
             return Response::success(["message" => "Xóa user thành công."]);
         } catch (Exception $e) {
-            return Response::error($e->getMessage(), $e->getCode() ?: 500);
+            $code = (int)$e->getCode();
+            $code = $code > 0 ? $code : 500;
+            return Response::error($e->getMessage(), $code);
         }
     }
 }
+
+

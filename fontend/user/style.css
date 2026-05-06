@@ -1,4 +1,4 @@
-﻿body {
+body {
   font-family: Arial, sans-serif;
   max-width: 900px;
   margin: 24px auto;
@@ -11,6 +11,7 @@
 }
 
 input,
+select,
 button {
   padding: 6px 8px;
   font-size: 14px;
@@ -48,3 +49,10 @@ td {
   margin-top: 10px;
   color: #c00;
 }
+
+.footer-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+

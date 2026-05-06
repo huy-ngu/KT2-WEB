@@ -19,6 +19,7 @@ const updatePostForm = document.getElementById("updatePostForm");
 const closeUpdateModalBtn = document.getElementById("closeUpdateModalBtn");
 const updateTitleInput = document.getElementById("updateTitle");
 const updateContentInput = document.getElementById("updateContent");
+const logoutBtn = document.getElementById("logoutBtn");
 
 let posts = [];
 let currentPage = 1;
@@ -254,6 +255,29 @@ async function deletePost(postId) {
   }
 }
 
+async function logout() {
+  const token = localStorage.getItem("access_token");
+  if (!token) {
+    messageEl.textContent = "Thiếu access token. Vui lòng đăng nhập lại.";
+    return;
+  }
+
+  const res = await fetch(`${BASE_URL}/logout`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const payload = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(payload.message || "Đăng xuất thất bại.");
+  }
+
+  localStorage.removeItem("access_token");
+  window.location.href = "../login/login.html";
+}
+
 searchInput.addEventListener("input", applySearch);
 prevBtn.addEventListener("click", () => {
   currentPage -= 1;
@@ -342,6 +366,14 @@ tableBody.addEventListener("click", async (e) => {
     } catch (error) {
       messageEl.textContent = error.message || "Xóa post thất bại.";
     }
+  }
+});
+
+logoutBtn.addEventListener("click", async () => {
+  try {
+    await logout();
+  } catch (error) {
+    messageEl.textContent = error.message || "Đăng xuất thất bại.";
   }
 });
 

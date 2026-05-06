@@ -6,13 +6,16 @@ const pageInfo = document.getElementById("pageInfo");
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
 const searchInput = document.getElementById("searchInput");
+const roleFilter = document.getElementById("roleFilter");
 const searchBtn = document.getElementById("searchBtn");
 const messageEl = document.getElementById("message");
+const logoutBtn = document.getElementById("logoutBtn");
 
 let currentPage = 1;
 let totalPages = 1;
 let limit = DEFAULT_LIMIT;
 let searchKeyword = "";
+let selectedRole = "";
 
 function renderRows(rows) {
   if (!rows.length) {
@@ -60,6 +63,9 @@ async function loadUsers(page = 1) {
   url.searchParams.set("limit", String(limit));
   if (searchKeyword) {
     url.searchParams.set("search", searchKeyword);
+  }
+  if (selectedRole) {
+    url.searchParams.set("role", selectedRole);
   }
 
   try {
@@ -110,16 +116,46 @@ async function deleteUser(userId) {
   }
 }
 
+async function logout() {
+  const token = localStorage.getItem("access_token");
+  if (!token) {
+    messageEl.textContent = "Thiếu access token. Vui lòng đăng nhập lại.";
+    return;
+  }
+
+  const res = await fetch(`${BASE_URL}/logout`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const payload = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(payload.message || "Đăng xuất thất bại.");
+  }
+
+  localStorage.removeItem("access_token");
+  window.location.href = "../login/login.html";
+}
+
 searchBtn.addEventListener("click", () => {
   searchKeyword = searchInput.value.trim();
+  selectedRole = roleFilter.value;
   loadUsers(1);
 });
 
 searchInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     searchKeyword = searchInput.value.trim();
+    selectedRole = roleFilter.value;
     loadUsers(1);
   }
+});
+
+roleFilter.addEventListener("change", () => {
+  selectedRole = roleFilter.value;
+  loadUsers(1);
 });
 
 prevBtn.addEventListener("click", () => {
@@ -155,6 +191,14 @@ tableBody.addEventListener("click", async (e) => {
     await loadUsers(currentPage);
   } catch (error) {
     messageEl.textContent = error.message || "Xóa user thất bại.";
+  }
+});
+
+logoutBtn.addEventListener("click", async () => {
+  try {
+    await logout();
+  } catch (error) {
+    messageEl.textContent = error.message || "Đăng xuất thất bại.";
   }
 });
 

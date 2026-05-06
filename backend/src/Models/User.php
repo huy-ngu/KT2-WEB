@@ -59,13 +59,22 @@ class User
         ]);
     }
 
-    public function findWithFilters(string $search = '', int $page = 1, int $limit = 10): array
+    public function findWithFilters(string $search = '', string $role = '', int $page = 1, int $limit = 10): array
     {
         $offset = ($page - 1) * $limit;
         $query = "SELECT id, username, role FROM " . $this->table;
+        $conditions = [];
 
         if ($search !== '') {
-            $query .= " WHERE username LIKE :search OR role LIKE :search";
+            $conditions[] = "(username LIKE :search_username OR role LIKE :search_role)";
+        }
+
+        if ($role !== '') {
+            $conditions[] = "role = :role";
+        }
+
+        if (!empty($conditions)) {
+            $query .= " WHERE " . implode(" AND ", $conditions);
         }
 
         $query .= " ORDER BY id DESC LIMIT :limit OFFSET :offset";
@@ -73,7 +82,12 @@ class User
         $stmt = $this->db->prepare($query);
 
         if ($search !== '') {
-            $stmt->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+            $searchValue = '%' . $search . '%';
+            $stmt->bindValue(':search_username', $searchValue, PDO::PARAM_STR);
+            $stmt->bindValue(':search_role', $searchValue, PDO::PARAM_STR);
+        }
+        if ($role !== '') {
+            $stmt->bindValue(':role', $role, PDO::PARAM_STR);
         }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
@@ -84,18 +98,32 @@ class User
         return $rows ?: [];
     }
 
-    public function countWithFilters(string $search = ''): int
+    public function countWithFilters(string $search = '', string $role = ''): int
     {
         $query = "SELECT COUNT(*) as total FROM " . $this->table;
+        $conditions = [];
 
         if ($search !== '') {
-            $query .= " WHERE username LIKE :search OR role LIKE :search";
+            $conditions[] = "(username LIKE :search_username OR role LIKE :search_role)";
+        }
+
+        if ($role !== '') {
+            $conditions[] = "role = :role";
+        }
+
+        if (!empty($conditions)) {
+            $query .= " WHERE " . implode(" AND ", $conditions);
         }
 
         $stmt = $this->db->prepare($query);
 
         if ($search !== '') {
-            $stmt->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+            $searchValue = '%' . $search . '%';
+            $stmt->bindValue(':search_username', $searchValue, PDO::PARAM_STR);
+            $stmt->bindValue(':search_role', $searchValue, PDO::PARAM_STR);
+        }
+        if ($role !== '') {
+            $stmt->bindValue(':role', $role, PDO::PARAM_STR);
         }
 
         $stmt->execute();
