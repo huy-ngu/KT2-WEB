@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bai viet cua toi</title>
+    <title>Bài viết của tôi</title>
     <link rel="stylesheet" href="./myposts.css">
 </head>
 <body>
     <main>
-        <h2>Bai viet cua toi</h2>
+        <h2>Bài viết của tôi</h2>
         <p id="message"></p>
 
         <table id="postTable">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Tieu de</th>
-                    <th>Noi dung</th>
-                    <th>Ngay dang</th>
-                    <th>Hanh dong</th>
+                    <th>Tiêu đề</th>
+                    <th>Nội dung</th>
+                    <th>Ngày đăng</th>
+                    <th>Hành động</th>
                 </tr>
             </thead>
             <tbody id="postTableBody">
@@ -29,22 +29,22 @@
         </table>
 
         <div class="footer-actions">
-            <button id="backBtn" type="button">Quay lai</button>
+            <button id="backBtn" type="button">Quay lại</button>
         </div>
 
         <div id="editModal" class="modal hidden">
             <div class="modal-content">
-                <h3>Sua bai viet</h3>
+                <h3>Sửa bài viết</h3>
                 <form id="editForm">
-                    <label for="editTitle">Tieu de</label>
+                    <label for="editTitle">Tiêu đề</label>
                     <input id="editTitle" type="text" required>
 
-                    <label for="editContent">Noi dung</label>
+                    <label for="editContent">Nội dung</label>
                     <textarea id="editContent" rows="5" required></textarea>
 
                     <div class="modal-actions">
-                        <button type="submit">Luu</button>
-                        <button id="closeEditBtn" type="button">Huy</button>
+                        <button type="submit">Lưu</button>
+                        <button id="closeEditBtn" type="button">Hủy</button>
                     </div>
                 </form>
             </div>

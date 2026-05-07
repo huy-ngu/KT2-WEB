@@ -56,8 +56,8 @@ function renderMyPosts(posts) {
           <td>${escapeHtml(post.content)}</td>
           <td>${escapeHtml(formatDate(post.created_at))}</td>
           <td>
-            <button type="button" class="edit-btn" data-id="${escapeHtml(post.id)}">Sua</button>
-            <button type="button" class="delete-btn" data-id="${escapeHtml(post.id)}">Xoa</button>
+            <button type="button" class="edit-btn" data-id="${escapeHtml(post.id)}">Sửa</button>
+            <button type="button" class="delete-btn" data-id="${escapeHtml(post.id)}">Xóa</button>
           </td>
         </tr>
       `
