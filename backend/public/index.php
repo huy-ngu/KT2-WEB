@@ -43,16 +43,6 @@ set_exception_handler(function (\Throwable $exception) {
 // Khởi tạo Router
 $router = new Router();
 
-// Test Route bằng kiến trúc mới
-$router->get('/ping', function (Request $request) {
-    return Response::success(["message" => "Pong! Kiến trúc mới hoạt động cực kỳ trơn tru."]);
-});
-
-$router->get('/test-db', function (Request $request) {
-    $db = new Database();
-    $conn = $db->getConnection();
-    return Response::success(["message" => "Kết nối CSDL thành công!"]);
-});
 
 // thêm route
 
@@ -60,6 +50,7 @@ $router->get('/test-db', function (Request $request) {
 $router->post('/register', [AuthController::class, 'register'], [RateLimitMiddleware::class]);
 $router->post('/login', [AuthController::class, 'login'], [RateLimitMiddleware::class]);
 $router->post('/logout', [AuthController::class, 'logout'], [AuthMiddleware::class]);
+$router->put('/change-password', [AuthController::class, 'changePassword'], [AuthMiddleware::class]);
 $router->get('/profile', [UserController::class, 'profile'], [AuthMiddleware::class]);
 
 

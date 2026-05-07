@@ -82,4 +82,33 @@ class AuthController
             "message" => "Đăng xuất thành công. Vui lòng xóa access token ở client."
         ], 200);
     }
+
+    /**
+     * API: PUT /change-password
+     */
+    public function changePassword(Request $request): Response
+    {
+        try {
+            $oldPassword = $request->input('old_password');
+            $newPassword = $request->input('new_password');
+            $userId = $request->userId; // Được gán từ AuthMiddleware
+
+            if (empty($oldPassword) || empty($newPassword)) {
+                return Response::error("Vui lòng nhập đủ mật khẩu cũ và mật khẩu mới.", 400);
+            }
+
+            if ($oldPassword === $newPassword) {
+                return Response::error("Mật khẩu mới không được trùng với mật khẩu cũ.", 400);
+            }
+
+            $this->authService->changePassword($userId, $oldPassword, $newPassword);
+
+            return Response::success([
+                "message" => "Đổi mật khẩu thành công!"
+            ], 200);
+        } catch (Exception $e) {
+            $code = $e->getCode() !== 0 ? $e->getCode() : 500;
+            return Response::error($e->getMessage(), $code);
+        }
+    }
 }

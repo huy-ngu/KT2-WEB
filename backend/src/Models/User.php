@@ -150,6 +150,29 @@ class User
         return $stmt->execute([':id' => $id]);
     }
 
+    public function findByIdObject(int $id): ?self
+    {
+        $query = "SELECT id, username, password, role FROM " . $this->table . " WHERE id = :id LIMIT 1";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $row = $stmt->fetch();
+        if (!$row) return null;
+
+        return $this->mapDataToModel($row);
+    }
+
+    public function updatePassword(int $id, string $hashedPassword): bool
+    {
+        $query = "UPDATE " . $this->table . " SET password = :password WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        return $stmt->execute([
+            ':password' => $hashedPassword,
+            ':id' => $id
+        ]);
+    }
+
     /**
      * Helper: Chuyển đổi mảng từ DB thành đối tượng Model
      */

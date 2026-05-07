@@ -6,7 +6,16 @@ const roleEl = document.getElementById("role");
 const messageEl = document.getElementById("message");
 const backBtn = document.getElementById("backBtn");
 const myPostsBtn = document.getElementById("myPostsBtn");
+const changePasswordBtn = document.getElementById("changePasswordBtn");
 const logoutBtn = document.getElementById("logoutBtn");
+
+// Modal elements
+const modal = document.getElementById("changePasswordModal");
+const closeModalBtn = document.getElementById("closeModalBtn");
+const changePasswordForm = document.getElementById("changePasswordForm");
+const oldPasswordInput = document.getElementById("oldPassword");
+const newPasswordInput = document.getElementById("newPassword");
+const modalMessageEl = document.getElementById("modalMessage");
 
 let isRedirectingToLogin = false;
 
@@ -125,6 +134,75 @@ logoutBtn.addEventListener("click", async () => {
     await logout();
   } catch (error) {
     messageEl.textContent = error.message || "Đăng xuất thất bại.";
+  }
+});
+
+// Modal Logic
+changePasswordBtn.addEventListener("click", () => {
+  modal.style.display = "block";
+  modalMessageEl.textContent = "";
+  modalMessageEl.className = "modal-message";
+  changePasswordForm.reset();
+});
+
+closeModalBtn.addEventListener("click", () => {
+  modal.style.display = "none";
+});
+
+window.addEventListener("click", (event) => {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+});
+
+changePasswordForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  
+  const token = getAccessTokenOrRedirect();
+  if (!token) return;
+
+  const oldPassword = oldPasswordInput.value;
+  const newPassword = newPasswordInput.value;
+
+  if (!oldPassword || !newPassword) {
+    modalMessageEl.textContent = "Vui lòng nhập đầy đủ thông tin.";
+    modalMessageEl.className = "modal-message";
+    return;
+  }
+
+  try {
+    const res = await fetch(`${BASE_URL}/change-password`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        old_password: oldPassword,
+        new_password: newPassword,
+      }),
+    });
+
+    const payload = await res.json().catch(() => ({}));
+    if (handleAuthExpiredResponse(res)) return;
+
+    if (!res.ok) {
+      modalMessageEl.textContent = payload.message || "Đổi mật khẩu thất bại.";
+      modalMessageEl.className = "modal-message";
+      return;
+    }
+
+    modalMessageEl.textContent = "Đổi mật khẩu thành công!";
+    modalMessageEl.className = "modal-message success";
+    
+    // Tự đóng modal sau 1.5s
+    setTimeout(() => {
+      modal.style.display = "none";
+    }, 1500);
+
+  } catch (error) {
+    modalMessageEl.textContent = "Không thể kết nối server.";
+    modalMessageEl.className = "modal-message";
   }
 });
 

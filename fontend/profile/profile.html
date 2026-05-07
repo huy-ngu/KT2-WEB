@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
@@ -29,7 +29,30 @@
     <div class="actions">
       <button id="backBtn" type="button">Quay lại</button>
       <button id="myPostsBtn" type="button">Bài viết của tôi</button>
+      <button id="changePasswordBtn" type="button">Đổi mật khẩu</button>
       <button id="logoutBtn" type="button">Đăng xuất</button>
+    </div>
+
+    <!-- Modal Đổi Mật Khẩu -->
+    <div id="changePasswordModal" class="modal">
+      <div class="modal-content">
+        <h3>Đổi mật khẩu</h3>
+        <form id="changePasswordForm">
+          <div class="form-group">
+            <label for="oldPassword">Mật khẩu cũ:</label>
+            <input type="password" id="oldPassword" required />
+          </div>
+          <div class="form-group">
+            <label for="newPassword">Mật khẩu mới:</label>
+            <input type="password" id="newPassword" required />
+          </div>
+          <p id="modalMessage" class="modal-message"></p>
+          <div class="modal-actions">
+            <button type="submit" id="submitPasswordBtn">Xác nhận</button>
+            <button type="button" id="closeModalBtn">Hủy</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <script src="./script.js"></script>

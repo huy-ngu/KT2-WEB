@@ -77,4 +77,32 @@ class AuthService
             ]
         ];
     }
+
+    /**
+     * Logic nghiệp vụ Đổi mật khẩu
+     */
+    public function changePassword(int $userId, string $oldPassword, string $newPassword): bool
+    {
+        // 1. Tìm user theo ID
+        $user = $this->userModel->findByIdObject($userId);
+
+        if (!$user) {
+            throw new Exception("Người dùng không tồn tại.", 404);
+        }
+
+        // 2. Kiểm tra mật khẩu cũ
+        if (!password_verify($oldPassword, $user->password)) {
+            throw new Exception("Mật khẩu cũ không chính xác.", 400);
+        }
+
+        // 3. Băm mật khẩu mới
+        $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+
+        // 4. Cập nhật DB
+        if (!$this->userModel->updatePassword($userId, $hashedPassword)) {
+            throw new Exception("Không thể cập nhật mật khẩu lúc này. Lỗi hệ thống.", 500);
+        }
+
+        return true;
+    }
 }
