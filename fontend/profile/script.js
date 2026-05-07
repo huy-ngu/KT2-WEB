@@ -8,6 +8,56 @@ const backBtn = document.getElementById("backBtn");
 const myPostsBtn = document.getElementById("myPostsBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 
+let isRedirectingToLogin = false;
+
+function decodeJwtPayload(token) {
+  const parts = token.split(".");
+  if (parts.length !== 3) return null;
+  const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+  try {
+    return JSON.parse(atob(base64));
+  } catch (error) {
+    return null;
+  }
+}
+
+function redirectToLogin(message = "Phien dang nhap da het han. Vui long dang nhap lai.") {
+  if (isRedirectingToLogin) return;
+  isRedirectingToLogin = true;
+  window.alert(message);
+  localStorage.removeItem("access_token");
+  window.location.href = "../login/login.html";
+}
+
+function isAccessTokenExpired(token) {
+  const payload = decodeJwtPayload(token);
+  return !payload?.exp || payload.exp * 1000 <= Date.now();
+}
+
+function getAccessTokenOrRedirect() {
+  const token = localStorage.getItem("access_token");
+  if (!token) {
+    redirectToLogin("Vui long dang nhap lai.");
+    return null;
+  }
+
+  if (isAccessTokenExpired(token)) {
+    redirectToLogin();
+    return null;
+  }
+
+  return token;
+}
+
+function handleAuthExpiredResponse(res) {
+  if (res.status === 401) {
+    redirectToLogin();
+    return true;
+  }
+
+  return false;
+}
+
 function renderProfile(profile) {
   userIdEl.textContent = profile?.id ?? "-";
   usernameEl.textContent = profile?.username ?? "-";
@@ -15,11 +65,8 @@ function renderProfile(profile) {
 }
 
 async function loadProfile() {
-  const token = localStorage.getItem("access_token");
-  if (!token) {
-    messageEl.textContent = "Thiếu access token. Vui lòng đăng nhập lại.";
-    return;
-  }
+  const token = getAccessTokenOrRedirect();
+  if (!token) return;
 
   messageEl.textContent = "";
 
@@ -32,46 +79,21 @@ async function loadProfile() {
     });
 
     const payload = await res.json().catch(() => ({}));
+    if (handleAuthExpiredResponse(res)) return;
     if (!res.ok) {
-      messageEl.textContent = payload.message || "Không tải được profile.";
+      messageEl.textContent = payload.message || "Khong tai duoc profile.";
       return;
     }
 
     renderProfile(payload);
   } catch (error) {
-    messageEl.textContent = "Không thể kết nối server.";
+    messageEl.textContent = "Khong the ket noi server.";
   }
-}
-
-async function loadMyPosts() {
-  const token = localStorage.getItem("access_token");
-  if (!token) {
-    window.location.href = "../login/login.html";
-    return;
-  }
-
-  const res = await fetch(`${BASE_URL}/profile`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    messageEl.textContent = data.message || "Không tải được bài viết người dùng.";
-    return;
-  }
-
-  console.log("Bài viết của người dùng:", data);
 }
 
 async function logout() {
-  const token = localStorage.getItem("access_token");
-  if (!token) {
-    messageEl.textContent = "Thiếu access token. Vui lòng đăng nhập lại.";
-    return;
-  }
+  const token = getAccessTokenOrRedirect();
+  if (!token) return;
 
   const res = await fetch(`${BASE_URL}/logout`, {
     method: "POST",
@@ -81,8 +103,9 @@ async function logout() {
   });
 
   const payload = await res.json().catch(() => ({}));
+  if (handleAuthExpiredResponse(res)) return;
   if (!res.ok) {
-    throw new Error(payload.message || "Đăng xuất thất bại.");
+    throw new Error(payload.message || "Dang xuat that bai.");
   }
 
   localStorage.removeItem("access_token");
@@ -93,7 +116,6 @@ backBtn.addEventListener("click", () => {
   window.location.href = "../post/post.html";
 });
 
-
 myPostsBtn.addEventListener("click", () => {
   window.location.href = "../profile/myposts.html";
 });
@@ -102,11 +124,8 @@ logoutBtn.addEventListener("click", async () => {
   try {
     await logout();
   } catch (error) {
-    messageEl.textContent = error.message || "Đăng xuất thất bại.";
+    messageEl.textContent = error.message || "Dang xuat that bai.";
   }
 });
 
-
-
 loadProfile();
-loadMyPosts();

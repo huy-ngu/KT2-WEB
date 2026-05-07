@@ -29,6 +29,7 @@ let currentUserId = null;
 let currentUserRole = null;
 let tableColumns = [];
 let editingPostId = null;
+let isRedirectingToLogin = false;
 
 function normalizePostResponse(raw) {
   if (Array.isArray(raw)) {
@@ -59,6 +60,43 @@ function decodeJwtPayload(token) {
   } catch (error) {
     return null;
   }
+}
+
+function redirectToLogin(message = "Phien dang nhap da het han. Vui long dang nhap lai.") {
+  if (isRedirectingToLogin) return;
+  isRedirectingToLogin = true;
+  window.alert(message);
+  localStorage.removeItem("access_token");
+  window.location.href = "../login/login.html";
+}
+
+function isAccessTokenExpired(token) {
+  const payload = decodeJwtPayload(token);
+  return !payload?.exp || payload.exp * 1000 <= Date.now();
+}
+
+function getAccessTokenOrRedirect() {
+  const token = localStorage.getItem("access_token");
+  if (!token) {
+    redirectToLogin("Vui long dang nhap lai.");
+    return null;
+  }
+
+  if (isAccessTokenExpired(token)) {
+    redirectToLogin();
+    return null;
+  }
+
+  return token;
+}
+
+function handleAuthExpiredResponse(res) {
+  if (res.status === 401) {
+    redirectToLogin();
+    return true;
+  }
+
+  return false;
 }
 
 function escapeHtml(value) {
@@ -164,11 +202,8 @@ function closeUpdateModal() {
 }
 
 async function loadPosts() {
-  const token = localStorage.getItem("access_token");
-  if (!token) {
-    messageEl.textContent = "Thiếu access token. Vui lòng đăng nhập lại.";
-    return;
-  }
+  const token = getAccessTokenOrRedirect();
+  if (!token) return;
 
   try {
     const keyword = searchInput.value.trim();
@@ -188,6 +223,7 @@ async function loadPosts() {
     });
 
     const data = await res.json().catch(() => ({}));
+    if (handleAuthExpiredResponse(res)) return;
     if (!res.ok) {
       messageEl.textContent = data.message || "Không tải được danh sách post.";
       return;
@@ -207,11 +243,8 @@ async function loadPosts() {
 }
 
 async function createPost(title, content) {
-  const token = localStorage.getItem("access_token");
-  if (!token) {
-    messageEl.textContent = "Thiếu access token. Vui lòng đăng nhập lại.";
-    return;
-  }
+  const token = getAccessTokenOrRedirect();
+  if (!token) return;
 
   const res = await fetch(`${BASE_URL}/posts`, {
     method: "POST",
@@ -223,13 +256,15 @@ async function createPost(title, content) {
   });
 
   const data = await res.json().catch(() => ({}));
+  if (handleAuthExpiredResponse(res)) return;
   if (!res.ok) {
     throw new Error(data.message || "Tạo post thất bại.");
   }
 }
 
 async function updatePost(postId, title, content) {
-  const token = localStorage.getItem("access_token");
+  const token = getAccessTokenOrRedirect();
+  if (!token) return;
   const res = await fetch(`${BASE_URL}/posts/${postId}`, {
     method: "PUT",
     headers: {
@@ -239,13 +274,15 @@ async function updatePost(postId, title, content) {
     body: JSON.stringify({ title, content }),
   });
   const data = await res.json().catch(() => ({}));
+  if (handleAuthExpiredResponse(res)) return;
   if (!res.ok) {
     throw new Error(data.message || "Cập nhật post thất bại.");
   }
 }
 
 async function deletePost(postId) {
-  const token = localStorage.getItem("access_token");
+  const token = getAccessTokenOrRedirect();
+  if (!token) return;
   const res = await fetch(`${BASE_URL}/posts/${postId}`, {
     method: "DELETE",
     headers: {
@@ -253,17 +290,15 @@ async function deletePost(postId) {
     },
   });
   const data = await res.json().catch(() => ({}));
+  if (handleAuthExpiredResponse(res)) return;
   if (!res.ok) {
     throw new Error(data.message || "Xóa post thất bại.");
   }
 }
 
 async function logout() {
-  const token = localStorage.getItem("access_token");
-  if (!token) {
-    messageEl.textContent = "Thiếu access token. Vui lòng đăng nhập lại.";
-    return;
-  }
+  const token = getAccessTokenOrRedirect();
+  if (!token) return;
 
   const res = await fetch(`${BASE_URL}/logout`, {
     method: "POST",
@@ -273,6 +308,7 @@ async function logout() {
   });
 
   const payload = await res.json().catch(() => ({}));
+  if (handleAuthExpiredResponse(res)) return;
   if (!res.ok) {
     throw new Error(payload.message || "Đăng xuất thất bại.");
   }
@@ -385,7 +421,7 @@ profileBtn.addEventListener("click", () => {
 });
 
 (() => {
-  const token = localStorage.getItem("access_token");
+  const token = getAccessTokenOrRedirect();
   if (!token) return;
   const payload = decodeJwtPayload(token);
   currentUserId = Number(payload?.sub || 0) || null;

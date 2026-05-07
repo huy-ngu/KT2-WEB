@@ -11,6 +11,7 @@ const closeEditBtn = document.getElementById("closeEditBtn");
 
 let myPosts = [];
 let editingPostId = null;
+let isRedirectingToLogin = false;
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -28,13 +29,52 @@ function formatDate(value) {
   return date.toLocaleString("vi-VN");
 }
 
+function decodeJwtPayload(token) {
+  const parts = token.split(".");
+  if (parts.length !== 3) return null;
+  const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+  try {
+    return JSON.parse(atob(base64));
+  } catch (error) {
+    return null;
+  }
+}
+
+function redirectToLogin(message = "Phien dang nhap da het han. Vui long dang nhap lai.") {
+  if (isRedirectingToLogin) return;
+  isRedirectingToLogin = true;
+  window.alert(message);
+  localStorage.removeItem("access_token");
+  window.location.href = "../login/login.html";
+}
+
+function isAccessTokenExpired(token) {
+  const payload = decodeJwtPayload(token);
+  return !payload?.exp || payload.exp * 1000 <= Date.now();
+}
+
 function getToken() {
   const token = localStorage.getItem("access_token");
   if (!token) {
-    window.location.href = "../login/login.html";
+    redirectToLogin("Vui long dang nhap lai.");
     return null;
   }
+
+  if (isAccessTokenExpired(token)) {
+    redirectToLogin();
+    return null;
+  }
+
   return token;
+}
+
+function handleAuthExpiredResponse(res) {
+  if (res.status === 401) {
+    redirectToLogin();
+    return true;
+  }
+
+  return false;
 }
 
 function renderMyPosts(posts) {
@@ -91,6 +131,7 @@ async function loadMyPosts() {
     });
 
     const payload = await res.json().catch(() => ({}));
+    if (handleAuthExpiredResponse(res)) return;
     if (!res.ok) {
       postTableBody.innerHTML = `
         <tr>
@@ -126,6 +167,7 @@ async function updatePost(postId, title, content) {
   });
 
   const payload = await res.json().catch(() => ({}));
+  if (handleAuthExpiredResponse(res)) return;
   if (!res.ok) {
     throw new Error(payload.message || "Cap nhat bai viet that bai.");
   }
@@ -143,6 +185,7 @@ async function deletePost(postId) {
   });
 
   const payload = await res.json().catch(() => ({}));
+  if (handleAuthExpiredResponse(res)) return;
   if (!res.ok) {
     throw new Error(payload.message || "Xoa bai viet that bai.");
   }
