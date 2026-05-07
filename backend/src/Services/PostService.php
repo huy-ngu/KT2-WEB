@@ -45,6 +45,15 @@ class PostService
         return $post;
     }
 
+    public function getPostsByUserId(int $userId): array
+    {
+        if ($userId <= 0) {
+            throw new Exception("Token khong hop le.", 401);
+        }
+
+        return $this->postModel->findByUserId($userId);
+    }
+
     public function createPost(int $userId, string $title, string $content): bool
     {
         if (!$this->postModel->create($userId, $title, $content)) {

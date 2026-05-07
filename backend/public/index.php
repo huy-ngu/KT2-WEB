@@ -64,6 +64,7 @@ $router->get('/profile', [UserController::class, 'profile'], [AuthMiddleware::cl
 // post
 $router->get('/posts', [PostController::class, 'index']);
 $router->get('/posts/{id}', [PostController::class, 'show']);
+$router->get('/mypost', [PostController::class, 'myPosts'], [AuthMiddleware::class]);
 $router->post('/posts', [PostController::class, 'store'], [AuthMiddleware::class]);
 $router->put('/posts/{id}', [PostController::class, 'update'], [AuthMiddleware::class]);
 $router->delete('/posts/{id}', [PostController::class, 'destroy'], [AuthMiddleware::class]);

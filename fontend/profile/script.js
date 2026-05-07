@@ -5,6 +5,7 @@ const usernameEl = document.getElementById("username");
 const roleEl = document.getElementById("role");
 const messageEl = document.getElementById("message");
 const backBtn = document.getElementById("backBtn");
+const myPostsBtn = document.getElementById("myPostsBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 
 function renderProfile(profile) {
@@ -42,6 +43,29 @@ async function loadProfile() {
   }
 }
 
+async function loadMyPosts() {
+  const token = localStorage.getItem("access_token");
+  if (!token) {
+    window.location.href = "../login/login.html";
+    return;
+  }
+
+  const res = await fetch(`${BASE_URL}/profile`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    messageEl.textContent = data.message || "Không tải được bài viết người dùng.";
+    return;
+  }
+
+  console.log("Bài viết của người dùng:", data);
+}
+
 async function logout() {
   const token = localStorage.getItem("access_token");
   if (!token) {
@@ -74,6 +98,11 @@ backBtn.addEventListener("click", () => {
   window.location.href = "../post/post.html";
 });
 
+
+myPostsBtn.addEventListener("click", () => {
+  window.location.href = "../profile/myposts.html";
+});
+
 logoutBtn.addEventListener("click", async () => {
   try {
     await logout();
@@ -82,4 +111,7 @@ logoutBtn.addEventListener("click", async () => {
   }
 });
 
+
+
 loadProfile();
+loadMyPosts();

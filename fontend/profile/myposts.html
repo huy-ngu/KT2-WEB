@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bai viet cua toi</title>
+    <link rel="stylesheet" href="./myposts.css">
+</head>
+<body>
+    <main>
+        <h2>Bai viet cua toi</h2>
+        <p id="message"></p>
+
+        <table id="postTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tieu de</th>
+                    <th>Noi dung</th>
+                    <th>Ngay dang</th>
+                    <th>Hanh dong</th>
+                </tr>
+            </thead>
+            <tbody id="postTableBody">
+                <tr>
+                    <td colspan="5">Loading...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button id="backBtn" type="button">Quay lai</button>
+
+        <div id="editModal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Sua bai viet</h3>
+                <form id="editForm">
+                    <label for="editTitle">Tieu de</label>
+                    <input id="editTitle" type="text" required>
+
+                    <label for="editContent">Noi dung</label>
+                    <textarea id="editContent" rows="5" required></textarea>
+
+                    <div class="actions">
+                        <button type="submit">Luu</button>
+                        <button id="closeEditBtn" type="button">Huy</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="./myposts.js"></script>
+</body>
+</html>

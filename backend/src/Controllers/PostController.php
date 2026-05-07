@@ -51,6 +51,18 @@ class PostController implements ResourceControllerInterface
         }
     }
 
+    public function myPosts(Request $request): Response
+    {
+        try {
+            $userId = (int)$request->userId;
+            $posts = $this->postService->getPostsByUserId($userId);
+
+            return Response::success(["data" => $posts]);
+        } catch (Exception $e) {
+            return Response::error($e->getMessage(), $e->getCode() ?: 500);
+        }
+    }
+
     // 3. POST /posts (Yêu cầu đăng nhập)
     public function store(Request $request): Response
     {

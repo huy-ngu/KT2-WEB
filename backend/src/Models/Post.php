@@ -62,7 +62,7 @@ class Post
 
 
     /**
-     * Lấy danh sách tất cả bài đăng 
+     * Lấy danh sách tất cả bài đăng
      */
     public function findAll(): array
     {
@@ -90,6 +90,24 @@ class Post
         if (!$row) return null;
 
         return $this->mapDataToModel($row);
+    }
+
+    public function findByUserId(int $userId): array
+    {
+        $query = "SELECT id, user_id, title, content, created_at, updated_at
+                  FROM " . $this->table . "
+                  WHERE user_id = :user_id
+                  ORDER BY created_at DESC";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $posts = [];
+        while ($row = $stmt->fetch()) {
+            $posts[] = $this->mapDataToModel($row);
+        }
+
+        return $posts;
     }
 
     /**
