@@ -55,7 +55,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
       }
 
       if (role === "admin") {
-        window.location.href = "../user/user.html";
+        window.location.href = "../admin/admin.html";
         return;
       }
     }

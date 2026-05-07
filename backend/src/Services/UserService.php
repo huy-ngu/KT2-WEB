@@ -14,6 +14,24 @@ class UserService
         $this->userModel = $userModel;
     }
 
+    public function getProfile(int $userId): array
+    {
+        if ($userId <= 0) {
+            throw new Exception("Token không hợp lệ.", 401);
+        }
+
+        $user = $this->userModel->findById($userId);
+        if (!$user) {
+            throw new Exception("Không tìm thấy user.", 404);
+        }
+
+        return [
+            "id" => (int)$user["id"],
+            "username" => $user["username"],
+            "role" => $user["role"]
+        ];
+    }
+
     public function getFilteredUsers(string $search = '', string $role = '', int $page = 1, int $limit = 10): array
     {
         $users = $this->userModel->findWithFilters($search, $role, $page, $limit);

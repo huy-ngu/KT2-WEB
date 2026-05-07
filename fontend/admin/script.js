@@ -9,6 +9,7 @@ const searchInput = document.getElementById("searchInput");
 const roleFilter = document.getElementById("roleFilter");
 const searchBtn = document.getElementById("searchBtn");
 const messageEl = document.getElementById("message");
+const profileBtn = document.getElementById("profileBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 
 let currentPage = 1;
@@ -200,6 +201,10 @@ logoutBtn.addEventListener("click", async () => {
   } catch (error) {
     messageEl.textContent = error.message || "Đăng xuất thất bại.";
   }
+});
+
+profileBtn.addEventListener("click", () => {
+  window.location.href = "../profile/profile.html";
 });
 
 loadUsers(1);

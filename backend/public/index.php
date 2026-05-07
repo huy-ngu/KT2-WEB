@@ -54,15 +54,11 @@ $router->get('/test-db', function (Request $request) {
 
 // thêm route
 
+//auth
 $router->post('/register', [AuthController::class, 'register']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->post('/logout', [AuthController::class, 'logout'], [AuthMiddleware::class]);
-$router->get('/me', function (Request $request) {
-    return Response::success([
-        "message" => "Chào mừng bạn đã truy cập vào khu vực bí mật!",
-        "current_user" => $request->user
-    ]);
-}, [AuthMiddleware::class]);
+$router->get('/profile', [UserController::class, 'profile'], [AuthMiddleware::class]);
 
 
 // post
@@ -72,7 +68,7 @@ $router->post('/posts', [PostController::class, 'store'], [AuthMiddleware::class
 $router->put('/posts/{id}', [PostController::class, 'update'], [AuthMiddleware::class]);
 $router->delete('/posts/{id}', [PostController::class, 'destroy'], [AuthMiddleware::class]);
 
-// user (admin only)
+// user (role admin)
 $router->get('/users', [UserController::class, 'index'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->delete('/users/{id}', [UserController::class, 'destroy'], [AuthMiddleware::class, AdminMiddleware::class]);
 
