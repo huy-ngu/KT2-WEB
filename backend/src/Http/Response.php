@@ -13,13 +13,13 @@ class Response
         $this->statusCode = $statusCode;
     }
 
-    // Factory method cho thành công
+    //  thành công
     public static function success(mixed $data, int $code = 200): self
     {
         return new self($data, $code);
     }
 
-    // Factory method cho lỗi
+    //  lỗi
     public static function error(string $message, int $code = 400): self
     {
         return new self([
