@@ -1,78 +1,71 @@
 body {
   font-family: Arial, sans-serif;
-  margin: 0;
-  background: #f5f6f8;
-  color: #222;
+  max-width: 900px;
+  margin: 24px auto;
 }
 
 main {
-  max-width: 1000px;
-  margin: 32px auto;
-  padding: 0 16px;
+  width: 100%;
+}
+
+input,
+textarea,
+button {
+  padding: 6px 8px;
+  font-size: 14px;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  background: #fff;
 }
 
 th,
 td {
-  border: 1px solid #ddd;
-  padding: 10px;
+  border: 1px solid #d9d9d9;
+  padding: 8px;
   text-align: left;
-  vertical-align: top;
-}
-
-th {
-  background: #eef1f5;
-}
-
-button {
-  cursor: pointer;
-  margin: 4px;
-  padding: 8px 12px;
 }
 
 #message {
-  color: #c62828;
+  margin-top: 10px;
+  color: #c00;
 }
 
 .modal {
   position: fixed;
   inset: 0;
+  background: rgba(0, 0, 0, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.45);
 }
 
-.hidden {
+.modal.hidden {
   display: none;
 }
 
 .modal-content {
-  width: min(520px, calc(100% - 32px));
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-}
-
-label {
-  display: block;
-  margin: 12px 0 6px;
-}
-
-input,
-textarea {
-  box-sizing: border-box;
   width: 100%;
-  padding: 10px;
+  max-width: 420px;
+  background: #fff;
+  padding: 16px;
+  border-radius: 4px;
 }
 
-.actions {
+#editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.footer-actions {
+  margin-top: 12px;
   display: flex;
   justify-content: flex-end;
-  margin-top: 12px;
 }
