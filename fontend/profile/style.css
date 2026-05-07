@@ -1,0 +1,43 @@
+body {
+  font-family: Arial, sans-serif;
+  max-width: 520px;
+  margin: 24px auto;
+}
+
+.profile-card {
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  padding: 14px;
+  background: #fff;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.row:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  min-width: 90px;
+  font-weight: 600;
+}
+
+#message {
+  margin-top: 10px;
+  color: #c00;
+}
+
+.actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+button {
+  padding: 6px 10px;
+  font-size: 14px;
+}

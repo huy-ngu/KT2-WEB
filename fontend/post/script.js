@@ -19,6 +19,7 @@ const updatePostForm = document.getElementById("updatePostForm");
 const closeUpdateModalBtn = document.getElementById("closeUpdateModalBtn");
 const updateTitleInput = document.getElementById("updateTitle");
 const updateContentInput = document.getElementById("updateContent");
+const profileBtn = document.getElementById("profileBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 
 let posts = [];
@@ -375,6 +376,10 @@ logoutBtn.addEventListener("click", async () => {
   } catch (error) {
     messageEl.textContent = error.message || "Đăng xuất thất bại.";
   }
+});
+
+profileBtn.addEventListener("click", () => {
+  window.location.href = "../profile/profile.html";
 });
 
 (() => {

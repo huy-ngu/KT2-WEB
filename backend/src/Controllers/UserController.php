@@ -19,6 +19,21 @@ class UserController
         $this->userService = new UserService(new User($db->getConnection()));
     }
 
+    // GET /profile
+    public function profile(Request $request): Response
+    {
+        try {
+            $userId = (int)($request->userId ?? 0);
+            $profile = $this->userService->getProfile($userId);
+
+            return Response::success($profile);
+        } catch (Exception $e) {
+            $code = (int)$e->getCode();
+            $code = $code > 0 ? $code : 500;
+            return Response::error($e->getMessage(), $code);
+        }
+    }
+
     // GET /users?search=&role=&page=&limit=
     public function index(Request $request): Response
     {
@@ -54,5 +69,3 @@ class UserController
         }
     }
 }
-
-
