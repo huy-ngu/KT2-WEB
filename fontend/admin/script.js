@@ -9,6 +9,7 @@ const searchInput = document.getElementById("searchInput");
 const roleFilter = document.getElementById("roleFilter");
 const searchBtn = document.getElementById("searchBtn");
 const messageEl = document.getElementById("message");
+const postsBtn = document.getElementById("postsBtn");
 const profileBtn = document.getElementById("profileBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 
@@ -205,6 +206,10 @@ logoutBtn.addEventListener("click", async () => {
 
 profileBtn.addEventListener("click", () => {
   window.location.href = "../profile/profile.html";
+});
+
+postsBtn.addEventListener("click", () => {
+  window.location.href = "../post/post.html";
 });
 
 loadUsers(1);
