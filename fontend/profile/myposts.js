@@ -41,7 +41,7 @@ function renderMyPosts(posts) {
   if (!posts.length) {
     postTableBody.innerHTML = `
       <tr>
-        <td colspan="5">Ban chua co bai viet nao.</td>
+        <td colspan="5">Bạn chưa có bài viết nào.</td>
       </tr>
     `;
     return;

@@ -79,11 +79,11 @@ class PostService
         return true;
     }
 
-    public function deletePost(int $id, int $userId): bool
+    public function deletePost(int $id, int $userId, ?string $role = null): bool
     {
         $post = $this->getPostById($id);
 
-        if ($post->user_id !== $userId) {
+        if ($role !== 'admin' && $post->user_id !== $userId) {
             throw new Exception("Bạn không có quyền xóa bài đăng này.", 403);
         }
 

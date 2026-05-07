@@ -111,7 +111,8 @@ class PostController implements ResourceControllerInterface
     {
         try {
             $userId = $request->userId;
-            $this->postService->deletePost($id, $userId);
+            $role = $request->user->role ?? null;
+            $this->postService->deletePost($id, $userId, $role);
 
             return Response::success(["message" => "Xóa bài đăng thành công!"]);
         } catch (Exception $e) {

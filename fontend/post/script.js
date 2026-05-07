@@ -26,6 +26,7 @@ let posts = [];
 let currentPage = 1;
 let totalPages = 1;
 let currentUserId = null;
+let currentUserRole = null;
 let tableColumns = [];
 let editingPostId = null;
 
@@ -115,9 +116,10 @@ function renderTable() {
     .map((item) => {
       const itemUserId = Number(item.user_id ?? item.userId ?? 0);
       const isOwner = itemUserId === Number(currentUserId);
+      const canDelete = isOwner || currentUserRole === "admin";
       const actionHtml = `
         <button type="button" class="edit-btn" data-id="${item.id}" ${isOwner ? "" : "disabled"}>Sửa</button>
-        <button type="button" class="delete-btn" data-id="${item.id}" ${isOwner ? "" : "disabled"}>Xóa</button>
+        <button type="button" class="delete-btn" data-id="${item.id}" ${canDelete ? "" : "disabled"}>Xóa</button>
       `;
 
       return `
@@ -387,6 +389,7 @@ profileBtn.addEventListener("click", () => {
   if (!token) return;
   const payload = decodeJwtPayload(token);
   currentUserId = Number(payload?.sub || 0) || null;
+  currentUserRole = payload?.data?.role ?? null;
 })();
 
 loadPosts();
