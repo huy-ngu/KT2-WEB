@@ -21,7 +21,7 @@ function decodeJwtPayload(token) {
   }
 }
 
-function redirectToLogin(message = "Phien dang nhap da het han. Vui long dang nhap lai.") {
+function redirectToLogin(message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.") {
   if (isRedirectingToLogin) return;
   isRedirectingToLogin = true;
   window.alert(message);
@@ -37,7 +37,7 @@ function isAccessTokenExpired(token) {
 function getAccessTokenOrRedirect() {
   const token = localStorage.getItem("access_token");
   if (!token) {
-    redirectToLogin("Vui long dang nhap lai.");
+    redirectToLogin("Vui lòng đăng nhập lại.");
     return null;
   }
 
@@ -81,13 +81,13 @@ async function loadProfile() {
     const payload = await res.json().catch(() => ({}));
     if (handleAuthExpiredResponse(res)) return;
     if (!res.ok) {
-      messageEl.textContent = payload.message || "Khong tai duoc profile.";
+      messageEl.textContent = payload.message || "Không thể tải được profile.";
       return;
     }
 
     renderProfile(payload);
   } catch (error) {
-    messageEl.textContent = "Khong the ket noi server.";
+    messageEl.textContent = "Không thể kết nối server.";
   }
 }
 
@@ -105,7 +105,7 @@ async function logout() {
   const payload = await res.json().catch(() => ({}));
   if (handleAuthExpiredResponse(res)) return;
   if (!res.ok) {
-    throw new Error(payload.message || "Dang xuat that bai.");
+    throw new Error(payload.message || "Đăng xuất thất bại.");
   }
 
   localStorage.removeItem("access_token");
@@ -124,7 +124,7 @@ logoutBtn.addEventListener("click", async () => {
   try {
     await logout();
   } catch (error) {
-    messageEl.textContent = error.message || "Dang xuat that bai.";
+    messageEl.textContent = error.message || "Đăng xuất thất bại.";
   }
 });
 

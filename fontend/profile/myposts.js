@@ -213,7 +213,7 @@ postTableBody.addEventListener("click", async (event) => {
       await deletePost(postId);
       await loadMyPosts();
     } catch (error) {
-      messageEl.textContent = error.message || "Xoa bai viet that bai.";
+      messageEl.textContent = error.message || "Xóa bài viết thất bại.";
     }
   }
 });
@@ -227,7 +227,7 @@ editForm.addEventListener("submit", async (event) => {
   const content = editContentInput.value.trim();
 
   if (!title || !content) {
-    messageEl.textContent = "Tieu de va noi dung khong duoc de trong.";
+    messageEl.textContent = "Tiêu đề và nội dung không được để trống.";
     return;
   }
 
@@ -236,7 +236,7 @@ editForm.addEventListener("submit", async (event) => {
     closeEditModal();
     await loadMyPosts();
   } catch (error) {
-    messageEl.textContent = error.message || "Cap nhat bai viet that bai.";
+    messageEl.textContent = error.message || "Cập nhật bài viết thất bại.";
   }
 });
 

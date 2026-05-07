@@ -62,7 +62,7 @@ function decodeJwtPayload(token) {
   }
 }
 
-function redirectToLogin(message = "Phien dang nhap da het han. Vui long dang nhap lai.") {
+function redirectToLogin(message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.") {
   if (isRedirectingToLogin) return;
   isRedirectingToLogin = true;
   window.alert(message);
@@ -78,7 +78,7 @@ function isAccessTokenExpired(token) {
 function getAccessTokenOrRedirect() {
   const token = localStorage.getItem("access_token");
   if (!token) {
-    redirectToLogin("Vui long dang nhap lai.");
+    redirectToLogin("Vui lòng đăng nhập lại.");
     return null;
   }
 

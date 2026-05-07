@@ -31,7 +31,7 @@ function decodeJwtPayload(token) {
   }
 }
 
-function redirectToLogin(message = "Phien dang nhap da het han. Vui long dang nhap lai.") {
+function redirectToLogin(message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại") {
   if (isRedirectingToLogin) return;
   isRedirectingToLogin = true;
   window.alert(message);
@@ -47,7 +47,7 @@ function isAccessTokenExpired(token) {
 function getAccessTokenOrRedirect() {
   const token = localStorage.getItem("access_token");
   if (!token) {
-    redirectToLogin("Vui long dang nhap lai.");
+    redirectToLogin("Vui lòng đăng nhập lại.");
     return null;
   }
 
@@ -70,7 +70,7 @@ function handleAuthExpiredResponse(res) {
 
 function renderRows(rows) {
   if (!rows.length) {
-    tableBody.innerHTML = '<tr><td colspan="4">Khong co du lieu</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="4">Không có dữ liệu</td></tr>';
     return;
   }
 
@@ -87,7 +87,7 @@ function renderRows(rows) {
             class="delete-btn"
             data-id="${user.id ?? ""}"
             ${isAdmin ? "disabled" : ""}
-          >Xoa</button>
+          >Xóa</button>
         </td>
       </tr>`;
     })
@@ -127,7 +127,7 @@ async function loadUsers(page = 1) {
     const payload = await res.json().catch(() => ({}));
     if (handleAuthExpiredResponse(res)) return;
     if (!res.ok) {
-      messageEl.textContent = payload.message || "Tai danh sach user that bai.";
+      messageEl.textContent = payload.message || "Không thể tải danh sách người dùng.";
       return;
     }
 
@@ -141,7 +141,7 @@ async function loadUsers(page = 1) {
     renderRows(rows);
     updatePaginationUi();
   } catch (error) {
-    messageEl.textContent = "Khong the ket noi server.";
+    messageEl.textContent = "Không thể kết nối server.";
   }
 }
 
@@ -159,7 +159,7 @@ async function deleteUser(userId) {
   const payload = await res.json().catch(() => ({}));
   if (handleAuthExpiredResponse(res)) return;
   if (!res.ok) {
-    throw new Error(payload.message || "Xoa user that bai.");
+    throw new Error(payload.message || "Xóa user thất bại.");
   }
 }
 
@@ -177,7 +177,7 @@ async function logout() {
   const payload = await res.json().catch(() => ({}));
   if (handleAuthExpiredResponse(res)) return;
   if (!res.ok) {
-    throw new Error(payload.message || "Dang xuat that bai.");
+    throw new Error(payload.message || "Đăng xuất thất bại.");
   }
 
   localStorage.removeItem("access_token");
@@ -226,7 +226,7 @@ tableBody.addEventListener("click", async (e) => {
     return;
   }
 
-  const confirmed = window.confirm("Ban co chac muon xoa user nay?");
+  const confirmed = window.confirm("Bạn có chắc muốn xóa người dùng này?");
   if (!confirmed) {
     return;
   }
@@ -235,7 +235,7 @@ tableBody.addEventListener("click", async (e) => {
     await deleteUser(userId);
     await loadUsers(currentPage);
   } catch (error) {
-    messageEl.textContent = error.message || "Xoa user that bai.";
+    messageEl.textContent = error.message || "Xóa người dùng thất bại.";
   }
 });
 
@@ -243,7 +243,7 @@ logoutBtn.addEventListener("click", async () => {
   try {
     await logout();
   } catch (error) {
-    messageEl.textContent = error.message || "Dang xuat that bai.";
+    messageEl.textContent = error.message || "Đăng xuất thất bại.";
   }
 });
 
