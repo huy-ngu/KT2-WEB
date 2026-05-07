@@ -11,6 +11,7 @@ use App\Config\Database;
 use App\Controllers\AuthController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\AdminMiddleware;
+use App\Middleware\RateLimitMiddleware;
 use App\Controllers\PostController;
 use App\Controllers\UserController;
 
@@ -18,6 +19,7 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
 // Cấu hình CORS
+// header("Access-Control-Allow-Origin: http://127.0.0.1:5500");
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
@@ -33,7 +35,7 @@ set_error_handler(function ($severity, $message, $file, $line) {
     throw new \ErrorException($message, 0, $severity, $file, $line);
 });
 
-// Sử dụng class Response mới để xử lý Exception
+// xử lý Exception
 set_exception_handler(function (\Throwable $exception) {
     Response::error("Lỗi hệ thống: " . $exception->getMessage(), 500)->send();
 });
@@ -55,8 +57,8 @@ $router->get('/test-db', function (Request $request) {
 // thêm route
 
 //auth
-$router->post('/register', [AuthController::class, 'register']);
-$router->post('/login', [AuthController::class, 'login']);
+$router->post('/register', [AuthController::class, 'register'], [RateLimitMiddleware::class]);
+$router->post('/login', [AuthController::class, 'login'], [RateLimitMiddleware::class]);
 $router->post('/logout', [AuthController::class, 'logout'], [AuthMiddleware::class]);
 $router->get('/profile', [UserController::class, 'profile'], [AuthMiddleware::class]);
 
